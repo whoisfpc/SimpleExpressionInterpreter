@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SimpleExpressionInterpreter.Tokens;
 
 namespace SimpleExpressionInterpreter
 {
@@ -15,123 +16,176 @@ namespace SimpleExpressionInterpreter
                 Console.WriteLine();
                 Console.Write("input expression:");
                 var source = Console.ReadLine();
-                var postfix = Convert2Postfix(source);
-                Console.WriteLine("postfix expression: {0}", postfix);
+                List<Token> tokens = new List<Token>();
+                Source2Tokens(source, tokens);
+                foreach (var token in tokens)
+                {
+                    Console.WriteLine("{0}, value: {1}", token.tokenType, token);
+                }
+                var postfix = Convert2Postfix(tokens);
+                Console.Write("postfix expression: ");
+                foreach (var token in postfix)
+                {
+                    Console.Write("{0} ", token);
+                }
+                Console.WriteLine();
                 Console.WriteLine("calcuate result: {0}", CalcPostfix(postfix));
                 Console.WriteLine("press Q quit, press other key continue...");
                 key = Console.ReadKey();
             } while (key.Key != ConsoleKey.Q);
         }
 
-        static string Convert2Postfix(string source)
+        static void Source2Tokens(string source, IList<Token> tokens)
         {
-            StringBuilder postfix = new StringBuilder(source.Length);
-            Stack<char> mark = new Stack<char>();
-            Dictionary<char, int> priority = new Dictionary<char, int>();
-            priority['+'] = 0;
-            priority['-'] = 0;
-            priority['*'] = 1;
-            priority['/'] = 1;
-            char last = ' ';
-
-            foreach (var ch in source)
-            {
-                if ((ch >= '0' && ch <= '9') || ch == '.')
-                {
-                    postfix.Append(ch);
-                }
-                else if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
-                {
-                    if (last >= '0' && last <= '9')
-                    {
-                        postfix.Append('#');
-                    }
-                    if (mark.Count > 0)
-                    {
-                        char top = mark.Peek();
-                        while (top != '(' && priority[ch] <= priority[top])
-                        {
-                            postfix.Append(top);
-                            mark.Pop();
-                            if (mark.Count == 0)
-                            {
-                                break;
-                            }
-                            top = mark.Peek();
-                        }
-                    }
-                    mark.Push(ch);
-                }
-                else if (ch == '(')
-                {
-                    if (last >= '0' && last <= '9')
-                    {
-                        postfix.Append('#');
-                        mark.Push('*');
-                    }
-                    mark.Push(ch);
-                }
-                else if (ch == ')')
-                {
-                    postfix.Append('#');
-                    while (mark.Peek() != '(')
-                    {
-                        postfix.Append(mark.Pop());
-                    }
-                    mark.Pop();
-                }
-                last = ch;
-            }
-            if (source.Last() != ')')
-            {
-                postfix.Append('#');
-            }
-            while (mark.Count > 0)
-            {
-                postfix.Append(mark.Pop());
-            }
-            return postfix.ToString();
-        }
-
-        static float CalcPostfix(string postfix)
-        {
-            Stack<float> result = new Stack<float>();
             StringBuilder numBuilder = new StringBuilder();
-            float tmp;
-            foreach(var ch in postfix)
+            char ch;
+            for (int i = 0; i < source.Length; i++)
             {
+                ch = source[i];
                 if ((ch >= '0' && ch <= '9') || ch == '.')
                 {
                     numBuilder.Append(ch);
                 }
-                else if (ch == '+')
+                else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')')
                 {
-                    tmp = result.Pop();
-                    tmp = result.Pop() + tmp;
-                    result.Push(tmp);
+                    if (numBuilder.Length > 0)
+                    {
+                        tokens.Add(new Num(numBuilder.ToString()));
+                        numBuilder.Clear();
+                    }
+                    Token tmpToken;
+                    switch (ch)
+                    {
+                        case '+':
+                            tmpToken = new Plus();
+                            break;
+                        case '-':
+                            tmpToken = new Minus();
+                            break;
+                        case '*':
+                            tmpToken = new Mul();
+                            break;
+                        case '/':
+                            tmpToken = new Div();
+                            break;
+                        case '(':
+                            tmpToken = new LP();
+                            break;
+                        case ')':
+                            tmpToken = new RP();
+                            break;
+                        default:
+                            tmpToken = new None();
+                            break;
+                    }
+                    tokens.Add(tmpToken);
                 }
-                else if (ch == '-')
+            }
+            if (numBuilder.Length > 0)
+            {
+                tokens.Add(new Num(numBuilder.ToString()));
+                numBuilder.Clear();
+            }
+        }
+
+        static IList<Token> Convert2Postfix(IList<Token> tokens)
+        {
+            List<Token> postfix = new List<Token>();
+            Stack<Token> mark = new Stack<Token>();
+            Dictionary<TokenType, int> priority = new Dictionary<TokenType, int>();
+            priority[TokenType.Plus] = 0;
+            priority[TokenType.Minus] = 0;
+            priority[TokenType.Mul] = 1;
+            priority[TokenType.Div] = 1;
+            Token last = new None();
+
+            foreach(var token in tokens)
+            {
+                switch (token.tokenType)
                 {
-                    tmp = result.Pop();
-                    tmp = result.Pop() - tmp;
-                    result.Push(tmp);
+                    case TokenType.Num:
+                        postfix.Add(token);
+                        break;
+                    case TokenType.Plus:
+                    case TokenType.Minus:
+                    case TokenType.Mul:
+                    case TokenType.Div:
+                        if (mark.Count > 0)
+                        {
+                            var top = mark.Peek();
+                            while(top.tokenType != TokenType.LP
+                                && priority[token.tokenType] <= priority[token.tokenType])
+                            {
+                                postfix.Add(top);
+                                mark.Pop();
+                                if (mark.Count == 0)
+                                {
+                                    break;
+                                }
+                                top = mark.Peek();
+                            }
+                        }
+                        mark.Push(token);
+                        break;
+                    case TokenType.LP:
+                        if (last.tokenType == TokenType.Num)
+                        {
+                            mark.Push(new Mul());
+                        }
+                        mark.Push(token);
+                        break;
+                    case TokenType.RP:
+                        while (mark.Peek().tokenType != TokenType.LP)
+                        {
+                            postfix.Add(mark.Pop());
+                        }
+                        mark.Pop();
+                        break;
+                    default:
+                        break;
                 }
-                else if (ch == '*')
+                last = token;
+            }
+            while (mark.Count > 0)
+            {
+                postfix.Add(mark.Pop());
+            }
+            return postfix;
+        }
+
+        static float CalcPostfix(IList<Token> postfix)
+        {
+            Stack<float> result = new Stack<float>();
+            float tmp;
+            foreach(var token in postfix)
+            {
+                switch (token.tokenType)
                 {
-                    tmp = result.Pop();
-                    tmp = result.Pop() * tmp;
-                    result.Push(tmp);
-                }
-                else if (ch == '/')
-                {
-                    tmp = result.Pop();
-                    tmp = result.Pop() / tmp;
-                    result.Push(tmp);
-                }
-                else if (ch == '#')
-                {
-                    result.Push(float.Parse(numBuilder.ToString()));
-                    numBuilder.Clear();
+                    case TokenType.Num:
+                        result.Push(float.Parse(token.value));
+                        break;
+                    case TokenType.Plus:
+                        tmp = result.Pop();
+                        tmp = result.Pop() + tmp;
+                        result.Push(tmp);
+                        break;
+                    case TokenType.Minus:
+                        tmp = result.Pop();
+                        tmp = result.Pop() - tmp;
+                        result.Push(tmp);
+                        break;
+                    case TokenType.Mul:
+                        tmp = result.Pop();
+                        tmp = result.Pop() * tmp;
+                        result.Push(tmp);
+                        break;
+                    case TokenType.Div:
+                        tmp = result.Pop();
+                        tmp = result.Pop() / tmp;
+                        result.Push(tmp);
+                        break;
+                    default:
+                        break;
                 }
             }
             return result.Pop();
