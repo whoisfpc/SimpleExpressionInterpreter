@@ -16,13 +16,7 @@ namespace SimpleExpressionInterpreter
                 Console.WriteLine();
                 Console.Write("input expression:");
                 var source = Console.ReadLine();
-                List<Token> tokens = new List<Token>();
-                Source2Tokens(source, tokens);
-                foreach (var token in tokens)
-                {
-                    Console.WriteLine("{0}, value: {1}", token.tokenType, token);
-                }
-                var postfix = Convert2Postfix(tokens);
+                var postfix = Convert2Postfix(new Lexer(source));
                 Console.Write("postfix expression: ");
                 foreach (var token in postfix)
                 {
@@ -35,60 +29,7 @@ namespace SimpleExpressionInterpreter
             } while (key.Key != ConsoleKey.Q);
         }
 
-        static void Source2Tokens(string source, IList<Token> tokens)
-        {
-            StringBuilder numBuilder = new StringBuilder();
-            char ch;
-            for (int i = 0; i < source.Length; i++)
-            {
-                ch = source[i];
-                if ((ch >= '0' && ch <= '9') || ch == '.')
-                {
-                    numBuilder.Append(ch);
-                }
-                else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')')
-                {
-                    if (numBuilder.Length > 0)
-                    {
-                        tokens.Add(new Num(numBuilder.ToString()));
-                        numBuilder.Clear();
-                    }
-                    Token tmpToken;
-                    switch (ch)
-                    {
-                        case '+':
-                            tmpToken = new Plus();
-                            break;
-                        case '-':
-                            tmpToken = new Minus();
-                            break;
-                        case '*':
-                            tmpToken = new Mul();
-                            break;
-                        case '/':
-                            tmpToken = new Div();
-                            break;
-                        case '(':
-                            tmpToken = new LP();
-                            break;
-                        case ')':
-                            tmpToken = new RP();
-                            break;
-                        default:
-                            tmpToken = new None();
-                            break;
-                    }
-                    tokens.Add(tmpToken);
-                }
-            }
-            if (numBuilder.Length > 0)
-            {
-                tokens.Add(new Num(numBuilder.ToString()));
-                numBuilder.Clear();
-            }
-        }
-
-        static IList<Token> Convert2Postfix(IList<Token> tokens)
+        static IList<Token> Convert2Postfix(Lexer lexer)
         {
             List<Token> postfix = new List<Token>();
             Stack<Token> mark = new Stack<Token>();
@@ -99,7 +40,7 @@ namespace SimpleExpressionInterpreter
             priority[TokenType.Div] = 1;
             Token last = new None();
 
-            foreach(var token in tokens)
+            foreach(var token in lexer)
             {
                 switch (token.tokenType)
                 {
