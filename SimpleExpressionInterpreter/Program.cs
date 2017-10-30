@@ -16,7 +16,12 @@ namespace SimpleExpressionInterpreter
                 Console.WriteLine();
                 Console.Write("input expression:");
                 var source = Console.ReadLine();
-                var postfix = Convert2Postfix(new Lexer(source));
+                var lexer = new Lexer(source);
+                foreach (var token in lexer)
+                {
+                    Console.WriteLine("{0} : {1}", token.tokenType, token.value);
+                }
+                var postfix = Convert2Postfix(lexer);
                 Console.Write("postfix expression: ");
                 foreach (var token in postfix)
                 {
@@ -55,7 +60,7 @@ namespace SimpleExpressionInterpreter
                         {
                             var top = mark.Peek();
                             while(top.tokenType != TokenType.LP
-                                && priority[token.tokenType] <= priority[token.tokenType])
+                                && priority[token.tokenType] <= priority[top.tokenType])
                             {
                                 postfix.Add(top);
                                 mark.Pop();

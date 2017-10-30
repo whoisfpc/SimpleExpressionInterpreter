@@ -13,9 +13,9 @@ namespace SimpleExpressionInterpreter.Tokens
         /// </summary>
         None,
         /// <summary>
-        /// 变量
+        /// 标识符
         /// </summary>
-        Var,
+        Id,
         /// <summary>
         /// 数字
         /// </summary>
@@ -71,11 +71,11 @@ namespace SimpleExpressionInterpreter.Tokens
         }
     }
 
-    public sealed class Var : Token
+    public sealed class Id : Token
     {
-        public Var(string value)
+        public Id(string value)
         {
-            tokenType = TokenType.Var;
+            tokenType = TokenType.Id;
             this.value = value;
         }
     }

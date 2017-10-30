@@ -1,9 +1,7 @@
 ﻿using SimpleExpressionInterpreter.Tokens;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Collections;
 
 namespace SimpleExpressionInterpreter
@@ -21,60 +19,6 @@ namespace SimpleExpressionInterpreter
         public Lexer(string source)
         {
             this.source = source;
-        }
-
-        static void Source2Tokens(string source, IList<Token> tokens)
-        {
-            StringBuilder numBuilder = new StringBuilder();
-            char ch;
-            for (int i = 0; i < source.Length; i++)
-            {
-                ch = source[i];
-                if ((ch >= '0' && ch <= '9') || ch == '.')
-                {
-                    numBuilder.Append(ch);
-                }
-                else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')')
-                {
-                    if (numBuilder.Length > 0)
-                    {
-                        tokens.Add(new Num(numBuilder.ToString()));
-                        numBuilder.Clear();
-                    }
-                    Token tmpToken;
-                    switch (ch)
-                    {
-                        case '+':
-                            tmpToken = new Plus();
-                            break;
-                        case '-':
-                            tmpToken = new Minus();
-                            break;
-                        case '*':
-                            tmpToken = new Mul();
-                            break;
-                        case '/':
-                            tmpToken = new Div();
-                            break;
-                        case '(':
-                            tmpToken = new LP();
-                            break;
-                        case ')':
-                            tmpToken = new RP();
-                            break;
-                        default:
-                            tmpToken = new None();
-                            break;
-                    }
-                    tokens.Add(tmpToken);
-                }
-            }
-            if (numBuilder.Length > 0)
-            {
-                tokens.Add(new Num(numBuilder.ToString()));
-                numBuilder.Clear();
-
-            }
         }
 
         public IEnumerator<Token> GetEnumerator()
@@ -111,6 +55,7 @@ namespace SimpleExpressionInterpreter
         private Token current;
         private StringBuilder numBuilder;
         private int pos;
+        private bool disposed = false;
 
         public TokenEnumerator(string source)
         {
@@ -121,28 +66,53 @@ namespace SimpleExpressionInterpreter
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+
+                }
+                source = null;
+                current = null;
+                numBuilder = null;
+            }
+            disposed = true;
+        }
+
+        ~TokenEnumerator()
+        {
+            Dispose(false);
         }
 
         public bool MoveNext()
         {
+            char ch;
+            char nextCh;
             //TODO: 需要加look ahead，实现正确的输出
             for (int i = pos; i < source.Length; i++)
             {
-                char ch = source[i];
+                ch = source[i];
+                nextCh = i != source.Length - 1 ? source[i + 1] : ' ';
                 if ((ch >= '0' && ch <= '9') || ch == '.')
                 {
                     numBuilder.Append(ch);
+                    // 没有处理'.'多次的情况
+                    if ((nextCh < '0' || nextCh > '0') && nextCh != '.')
+                    {
+                        pos = i + 1;
+                        current = new Num(numBuilder.ToString());
+                        numBuilder.Clear();
+                        return true;
+                    }
                 }
                 else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')')
                 {
-                    if (numBuilder.Length > 0)
-                    {
-                        this.current = new Num(numBuilder.ToString());
-                        numBuilder.Clear();
-                        pos = i;
-                        return true;
-                    }
                     switch (ch)
                     {
                         case '+':
@@ -167,6 +137,8 @@ namespace SimpleExpressionInterpreter
                             current = new None();
                             break;
                     }
+                    pos = i + 1;
+                    return true;
                 }
             }
             return false;
