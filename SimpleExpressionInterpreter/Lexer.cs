@@ -94,7 +94,7 @@ namespace SimpleExpressionInterpreter
         {
             char ch;
             char nextCh;
-            //TODO: 需要加look ahead，实现正确的输出
+            //TODO: 需要改用正则表达式获取token，以实现更强大的功能
             for (int i = pos; i < source.Length; i++)
             {
                 ch = source[i];

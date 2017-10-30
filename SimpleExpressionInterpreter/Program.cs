@@ -34,6 +34,7 @@ namespace SimpleExpressionInterpreter
             } while (key.Key != ConsoleKey.Q);
         }
 
+        // TODO: 需要构造抽象语法树来提供更好的扩展性
         static IList<Token> Convert2Postfix(Lexer lexer)
         {
             List<Token> postfix = new List<Token>();
