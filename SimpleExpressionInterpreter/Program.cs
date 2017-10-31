@@ -45,7 +45,7 @@ namespace SimpleExpressionInterpreter
             priority[TokenType.Minus] = 0;
             priority[TokenType.Mul] = 1;
             priority[TokenType.Div] = 1;
-            Token last = new None("");
+            Token last = new Error("");
 
             foreach(var token in lexer)
             {

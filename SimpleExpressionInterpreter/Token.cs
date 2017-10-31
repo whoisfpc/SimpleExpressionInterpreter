@@ -3,9 +3,9 @@
     public enum TokenType
     {
         /// <summary>
-        /// 无用类型
+        /// 无效的Token
         /// </summary>
-        None,
+        Error,
         /// <summary>
         /// 标识符
         /// </summary>
@@ -65,12 +65,12 @@
         }
     }
 
-    [TokenRegex(@"\G.*", Priority = 0)]
-    public sealed class None : Token
+    [TokenRegex(@"\G.", Priority = 0)]
+    public sealed class Error : Token
     {
-        public None(string value)
+        public Error(string value)
         {
-            tokenType = TokenType.None;
+            tokenType = TokenType.Error;
             this.value = value;
         }
     }

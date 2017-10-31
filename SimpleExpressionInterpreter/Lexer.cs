@@ -142,27 +142,31 @@ namespace SimpleExpressionInterpreter
             {
                 return false;
             }
-            for (int i = 0; i < lexInfos.Count; i++)  
+            while (pos < source.Length)
+            {
+                var token = FindToken();
+                if (!token.Ignore)
+                {
+                    current = token;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Token FindToken()
+        {
+            for (int i = 0; i < lexInfos.Count; i++)
             {
                 var lexInfo = lexInfos[i];
                 var match = lexInfo.Regex.Match(source, pos);
                 if (match.Success)
                 {
                     pos = match.Index + match.Length;
-                    var token = lexInfo.CtorInfo.Invoke(new object[] { match.Value }) as Token;
-                    if (!token.Ignore)
-                    {
-                        current = token;
-                        return true;
-                    }
-                    else
-                    {
-                        //对于需要忽略的Token，抛弃并查找下一个，因为i会自动+1，所以设其为-1
-                        i = -1;
-                    }
+                    return lexInfo.CtorInfo.Invoke(new object[] { match.Value }) as Token;
                 }
             }
-            return false;
+            return new Error("");
         }
 
         public void Reset()
