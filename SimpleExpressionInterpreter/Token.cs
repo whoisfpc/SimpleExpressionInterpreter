@@ -54,6 +54,10 @@
         /// 对应的值，（对于Id， Num类型），延后实际值的转换
         /// </summary>
         public string value;
+        /// <summary>
+        /// 该Token是否需要被忽略，（如注释，空格等）
+        /// </summary>
+        public virtual bool Ignore => false;
 
         public override string ToString()
         {
@@ -74,6 +78,7 @@
     [TokenRegex(@"\G\s+", Priority = 1)]
     public sealed class Space : Token
     {
+        public override bool Ignore => true;
 
         public Space(string value)
         {

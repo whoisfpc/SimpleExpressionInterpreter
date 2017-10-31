@@ -20,7 +20,7 @@ namespace SimpleExpressionInterpreter
                 lexer.Analyse(source);
                 foreach (var token in lexer)
                 {
-                    Console.WriteLine("{0} : {1}", token.tokenType, token.value);
+                    Console.WriteLine("{0}: {1}", token.tokenType, token.value);
                 }
                 var postfix = Convert2Postfix(lexer);
                 Console.Write("postfix expression: ");

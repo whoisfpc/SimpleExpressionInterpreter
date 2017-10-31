@@ -142,64 +142,24 @@ namespace SimpleExpressionInterpreter
             {
                 return false;
             }
-            foreach (var lexInfo in lexInfos)
+            for (int i = 0; i < lexInfos.Count; i++)  
             {
+                var lexInfo = lexInfos[i];
                 var match = lexInfo.Regex.Match(source, pos);
                 if (match.Success)
                 {
                     pos = match.Index + match.Length;
-                    current = lexInfo.CtorInfo.Invoke(new object[] { match.Value }) as Token;
-                    return true;
-                }
-            }
-            return false;
-            char ch;
-            char nextCh;
-            //TODO: 需要改用正则表达式获取token，以实现更强大的功能
-            for (int i = pos; i < source.Length; i++)
-            {
-                ch = source[i];
-                nextCh = i != source.Length - 1 ? source[i + 1] : ' ';
-                if ((ch >= '0' && ch <= '9') || ch == '.')
-                {
-                    numBuilder.Append(ch);
-                    // 没有处理'.'多次的情况
-                    if ((nextCh < '0' || nextCh > '0') && nextCh != '.')
+                    var token = lexInfo.CtorInfo.Invoke(new object[] { match.Value }) as Token;
+                    if (!token.Ignore)
                     {
-                        pos = i + 1;
-                        current = new Num(numBuilder.ToString());
-                        numBuilder.Clear();
+                        current = token;
                         return true;
                     }
-                }
-                else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '(' || ch == ')')
-                {
-                    switch (ch)
+                    else
                     {
-                        case '+':
-                            current = new Plus(ch.ToString());
-                            break;
-                        case '-':
-                            current = new Minus(ch.ToString());
-                            break;
-                        case '*':
-                            current = new Mul(ch.ToString());
-                            break;
-                        case '/':
-                            current = new Div(ch.ToString());
-                            break;
-                        case '(':
-                            current = new LP(ch.ToString());
-                            break;
-                        case ')':
-                            current = new RP(ch.ToString());
-                            break;
-                        default:
-                            current = new None(ch.ToString());
-                            break;
+                        //对于需要忽略的Token，抛弃并查找下一个，因为i会自动+1，所以设其为-1
+                        i = -1;
                     }
-                    pos = i + 1;
-                    return true;
                 }
             }
             return false;
