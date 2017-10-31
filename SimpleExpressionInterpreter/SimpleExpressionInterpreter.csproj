@@ -43,7 +43,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\TokenRegexAttribute.cs" />
+    <Compile Include="Compiler.cs" />
+    <Compile Include="Executor.cs" />
+    <Compile Include="Instruction.cs" />
     <Compile Include="Lexer.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token.cs" />
