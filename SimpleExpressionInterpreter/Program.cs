@@ -11,12 +11,13 @@ namespace SimpleExpressionInterpreter
         static void Main(string[] args)
         {
             ConsoleKeyInfo key;
+            var lexer = new Lexer();
             do
             {
                 Console.WriteLine();
                 Console.Write("input expression:");
                 var source = Console.ReadLine();
-                var lexer = new Lexer(source);
+                lexer.Analyse(source);
                 foreach (var token in lexer)
                 {
                     Console.WriteLine("{0} : {1}", token.tokenType, token.value);
@@ -44,7 +45,7 @@ namespace SimpleExpressionInterpreter
             priority[TokenType.Minus] = 0;
             priority[TokenType.Mul] = 1;
             priority[TokenType.Div] = 1;
-            Token last = new None();
+            Token last = new None("");
 
             foreach(var token in lexer)
             {
@@ -77,7 +78,7 @@ namespace SimpleExpressionInterpreter
                     case TokenType.LP:
                         if (last.tokenType == TokenType.Num)
                         {
-                            mark.Push(new Mul());
+                            mark.Push(new Mul("*"));
                         }
                         mark.Push(token);
                         break;
@@ -89,7 +90,7 @@ namespace SimpleExpressionInterpreter
                         mark.Pop();
                         break;
                     default:
-                        break;
+                        continue;
                 }
                 last = token;
             }

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace SimpleExpressionInterpreter
 {
@@ -15,20 +17,60 @@ namespace SimpleExpressionInterpreter
         /// expression source
         /// </summary>
         private string source;
+        /// <summary>
+        /// 按照优先级排列的词法分析信息
+        /// </summary>
+        private SortedList<int, LexInfo> sortedLex;
 
-        public Lexer(string source)
+        public Lexer()
+        {
+            var descendingComparer = Comparer<int>.Create((x, y) => {
+                var result = y.CompareTo(x);
+                if (result == 0)
+                    return 1;
+                else
+                    return result;
+            });
+            sortedLex = new SortedList<int, LexInfo>(descendingComparer);
+            var assembly = typeof(Lexer).Assembly;
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.IsDefined(typeof(TokenRegexAttribute), false))
+                {
+                    var tokenRegex = type.GetCustomAttribute<TokenRegexAttribute>();
+                    var regex = new Regex(tokenRegex.Pattern);
+                    var ctor = type.GetConstructor(new Type[] { typeof(string) });
+                    sortedLex.Add(tokenRegex.Priority, new LexInfo(regex, ctor));
+                }
+            }
+        }
+
+        public Lexer Analyse(string source)
         {
             this.source = source;
+            return this;
         }
 
         public IEnumerator<Token> GetEnumerator()
         {
-            return new TokenEnumerator(source);
+            return new TokenEnumerator(source, sortedLex.Values);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new TokenEnumerator(source);
+            return new TokenEnumerator(source, sortedLex.Values);
+        }
+
+        public class LexInfo
+        {
+            public Regex Regex { get; }
+            public ConstructorInfo CtorInfo { get; }
+
+            public LexInfo(Regex regex, ConstructorInfo ctorInfo)
+            {
+                Regex = regex;
+                CtorInfo = ctorInfo;
+            }
         }
     }
 
@@ -52,14 +94,16 @@ namespace SimpleExpressionInterpreter
         object IEnumerator.Current => Current;
 
         private string source;
+        private IList<Lexer.LexInfo> lexInfos;
         private Token current;
         private StringBuilder numBuilder;
         private int pos;
         private bool disposed = false;
 
-        public TokenEnumerator(string source)
+        public TokenEnumerator(string source, IList<Lexer.LexInfo> lexInfos)
         {
             this.source = source;
+            this.lexInfos = lexInfos;
             numBuilder = new StringBuilder();
             pos = 0;
         }
@@ -76,9 +120,11 @@ namespace SimpleExpressionInterpreter
             {
                 if (disposing)
                 {
-
+                    // dispose resources with IDispose interface
                 }
+                // dispose resources witout IDispose interface
                 source = null;
+                lexInfos = null;
                 current = null;
                 numBuilder = null;
             }
@@ -92,6 +138,21 @@ namespace SimpleExpressionInterpreter
 
         public bool MoveNext()
         {
+            if (pos >= source.Length)
+            {
+                return false;
+            }
+            foreach (var lexInfo in lexInfos)
+            {
+                var match = lexInfo.Regex.Match(source, pos);
+                if (match.Success)
+                {
+                    pos = match.Index + match.Length;
+                    current = lexInfo.CtorInfo.Invoke(new object[] { match.Value }) as Token;
+                    return true;
+                }
+            }
+            return false;
             char ch;
             char nextCh;
             //TODO: 需要改用正则表达式获取token，以实现更强大的功能
@@ -116,25 +177,25 @@ namespace SimpleExpressionInterpreter
                     switch (ch)
                     {
                         case '+':
-                            current = new Plus();
+                            current = new Plus(ch.ToString());
                             break;
                         case '-':
-                            current = new Minus();
+                            current = new Minus(ch.ToString());
                             break;
                         case '*':
-                            current = new Mul();
+                            current = new Mul(ch.ToString());
                             break;
                         case '/':
-                            current = new Div();
+                            current = new Div(ch.ToString());
                             break;
                         case '(':
-                            current = new LP();
+                            current = new LP(ch.ToString());
                             break;
                         case ')':
-                            current = new RP();
+                            current = new RP(ch.ToString());
                             break;
                         default:
-                            current = new None();
+                            current = new None(ch.ToString());
                             break;
                     }
                     pos = i + 1;

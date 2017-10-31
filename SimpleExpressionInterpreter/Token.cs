@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SimpleExpressionInterpreter.Tokens
+﻿namespace SimpleExpressionInterpreter.Tokens
 {
     public enum TokenType
     {
@@ -43,7 +37,11 @@ namespace SimpleExpressionInterpreter.Tokens
         /// <summary>
         /// 有括号
         /// </summary>
-        RP
+        RP,
+        /// <summary>
+        /// 空格
+        /// </summary>
+        Space
     }
 
     public abstract class Token
@@ -53,7 +51,7 @@ namespace SimpleExpressionInterpreter.Tokens
         /// </summary>
         public TokenType tokenType;
         /// <summary>
-        /// 对应的值，（对于Var， Num类型），延后实际值的转换
+        /// 对应的值，（对于Id， Num类型），延后实际值的转换
         /// </summary>
         public string value;
 
@@ -63,14 +61,28 @@ namespace SimpleExpressionInterpreter.Tokens
         }
     }
 
+    [TokenRegex(@"\G.*", Priority = 0)]
     public sealed class None : Token
     {
-        public None()
+        public None(string value)
         {
             tokenType = TokenType.None;
+            this.value = value;
         }
     }
 
+    [TokenRegex(@"\G\s+", Priority = 1)]
+    public sealed class Space : Token
+    {
+
+        public Space(string value)
+        {
+            tokenType = TokenType.Space;
+            this.value = value;
+        }
+    }
+
+    [TokenRegex(@"\G[a-zA-Z$]([a-zA-Z$\d])*", Priority = 1)]
     public sealed class Id : Token
     {
         public Id(string value)
@@ -80,6 +92,7 @@ namespace SimpleExpressionInterpreter.Tokens
         }
     }
 
+    [TokenRegex(@"\G\d+(\.\d+)?", Priority = 2)]
     public sealed class Num : Token
     {
         public Num(string value)
@@ -89,57 +102,63 @@ namespace SimpleExpressionInterpreter.Tokens
         }
     }
 
+    [TokenRegex(@"\G\+", Priority = 2)]
     public sealed class Plus : Token
     {
-        public Plus()
+        public Plus(string value)
         {
             tokenType = TokenType.Plus;
-            this.value = "+";
+            this.value = value;
         }
     }
 
+    [TokenRegex(@"\G\-", Priority = 2)]
     public sealed class Minus : Token
     {
-        public Minus()
+        public Minus(string value)
         {
             tokenType = TokenType.Minus;
-            this.value = "-";
+            this.value = value;
         }
     }
 
+    [TokenRegex(@"\G\*", Priority = 2)]
     public sealed class Mul : Token
     {
-        public Mul()
+        public Mul(string value)
         {
             tokenType = TokenType.Mul;
-            this.value = "*";
+            this.value = value;
         }
     }
 
+    [TokenRegex(@"\G/", Priority = 2)]
     public sealed class Div : Token
     {
-        public Div()
+        public Div(string value)
         {
             tokenType = TokenType.Div;
-            this.value = "/";
+            this.value = value;
         }
     }
 
+    [TokenRegex(@"\G\(", Priority = 2)]
     public sealed class LP : Token
     {
-        public LP()
+        public LP(string value)
         {
             tokenType = TokenType.LP;
-            this.value = "(";
+            this.value = value;
         }
     }
 
+    [TokenRegex(@"\G\)", Priority = 2)]
     public sealed class RP : Token
     {
-        public RP()
+        public RP(string value)
         {
             tokenType = TokenType.RP;
-            this.value = ")";
+            this.value = value;
         }
     }
 }
