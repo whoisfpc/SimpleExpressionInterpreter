@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using SimpleExpressionInterpreter.Tokens;
+using ExpressionInterpreter.Tokens;
 
-namespace SimpleExpressionInterpreter
+namespace ExpressionInterpreter
 {
     public class Parser
     {

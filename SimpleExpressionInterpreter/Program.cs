@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SimpleExpressionInterpreter
+namespace ExpressionInterpreter
 {
     class Program
     {
@@ -11,6 +11,7 @@ namespace SimpleExpressionInterpreter
             var compiler = new Compiler();
             var executor = new Executor();
             var variables = new Dictionary<int, float> { { 1, 15 }, { 2, 27.2f }, { 0, 777 } };
+            Console.WriteLine("variables, {0}={1}, {2}={3}", VarMap.GetVarName(1), variables[1], VarMap.GetVarName(2), variables[2]);
             do
             {
                 Console.WriteLine();
@@ -42,6 +43,19 @@ namespace SimpleExpressionInterpreter
                     break;
             }
             return 0;
+        }
+
+        public static string GetVarName(int varId)
+        {
+            switch (varId)
+            {
+                case 1:
+                    return "a";
+                case 2:
+                    return "b";
+                default:
+                    return "none";
+            }
         }
     }
 }

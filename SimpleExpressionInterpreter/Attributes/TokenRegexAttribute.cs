@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SimpleExpressionInterpreter
+namespace ExpressionInterpreter
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class TokenRegexAttribute : Attribute

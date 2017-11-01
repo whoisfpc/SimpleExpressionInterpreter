@@ -1,4 +1,4 @@
-﻿namespace SimpleExpressionInterpreter
+﻿namespace ExpressionInterpreter
 {
     /// <summary>
     /// 指令码

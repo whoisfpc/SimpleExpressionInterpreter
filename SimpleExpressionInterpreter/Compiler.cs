@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using SimpleExpressionInterpreter.Tokens;
+using ExpressionInterpreter.Tokens;
 
-namespace SimpleExpressionInterpreter
+namespace ExpressionInterpreter
 {
     // 暂时先通过解析后缀表达式来生成bytecode
     public class Compiler

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SimpleExpressionInterpreter
+namespace ExpressionInterpreter
 {
     // 没有容错
     public class Executor

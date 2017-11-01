@@ -1,4 +1,4 @@
-﻿using SimpleExpressionInterpreter.Tokens;
+﻿using ExpressionInterpreter.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace SimpleExpressionInterpreter
+namespace ExpressionInterpreter
 {
     /// <summary>
     /// Lexer, scanner source, generate tokens

@@ -1,4 +1,4 @@
-﻿namespace SimpleExpressionInterpreter.Tokens
+﻿namespace ExpressionInterpreter.Tokens
 {
     public enum TokenType
     {

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{72E00A67-A14F-4519-8BAA-DBA9B06BA3E8}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SimpleExpressionInterpreter</RootNamespace>
-    <AssemblyName>SimpleExpressionInterpreter</AssemblyName>
+    <RootNamespace>ExpressionInterpreter</RootNamespace>
+    <AssemblyName>ExpressionInterpreter</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
