@@ -13,8 +13,9 @@ namespace SimpleExpressionInterpreter
             stack = new Stack<float>(128);
         }
 
-        public float Execute(byte[] bytecodes)
+        public float Execute(byte[] bytecodes, Dictionary<int, float> variables)
         {
+            stack.Clear();
             var i = 0;
             float tmp;
             while (i < bytecodes.Length)
@@ -23,6 +24,19 @@ namespace SimpleExpressionInterpreter
                 i++;
                 switch (inst)
                 {
+                    case Instruction.PushVariable:
+                        int varId = BitConverter.ToInt32(bytecodes, i);
+                        i += 4;
+                        if (variables.ContainsKey(varId))
+                        {
+                            stack.Push(variables[varId]);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error: var not found, id: {0}", varId);
+                            return 0;
+                        }
+                        break;
                     case Instruction.PushLiteral:
                         tmp = BitConverter.ToSingle(bytecodes, i);
                         stack.Push(tmp);

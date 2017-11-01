@@ -26,6 +26,7 @@ namespace SimpleExpressionInterpreter
             {
                 switch (token.tokenType)
                 {
+                    case TokenType.Id:
                     case TokenType.Num:
                         postfix.Add(token);
                         break;

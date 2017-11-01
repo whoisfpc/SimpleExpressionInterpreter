@@ -37,10 +37,13 @@ namespace SimpleExpressionInterpreter
             {
                 switch (token.tokenType)
                 {
+                    case TokenType.Id:
+                        bytes.Add((byte)(Instruction.PushVariable));
+                        bytes.AddRange(BitConverter.GetBytes(VarMap.GetVarId(token.value)));
+                        break;
                     case TokenType.Num:
                         bytes.Add((byte)Instruction.PushLiteral);
-                        var num = float.Parse(token.value);
-                        bytes.AddRange(BitConverter.GetBytes(num));
+                        bytes.AddRange(BitConverter.GetBytes(float.Parse(token.value)));
                         break;
                     case TokenType.Plus:
                         bytes.Add((byte)Instruction.Add);
@@ -77,6 +80,11 @@ namespace SimpleExpressionInterpreter
                     case Instruction.PushLiteral:
                         var num = BitConverter.ToSingle(bytes, i);
                         Console.WriteLine("{0}\t{1}", inst, num);
+                        i += 4;
+                        break;
+                    case Instruction.PushVariable:
+                        var varId = BitConverter.ToInt32(bytes, i);
+                        Console.WriteLine("{0}\tid: {1}", inst, varId);
                         i += 4;
                         break;
                     default:
