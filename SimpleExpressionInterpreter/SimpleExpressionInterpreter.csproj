@@ -42,6 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractSyntaxTree\BaseTree.cs" />
+    <Compile Include="AbstractSyntaxTree\BinaryExpression.cs" />
+    <Compile Include="AbstractSyntaxTree\Expression.cs" />
+    <Compile Include="AbstractSyntaxTree\PrimaryExpression.cs" />
+    <Compile Include="AbstractSyntaxTree\RootExpression.cs" />
     <Compile Include="Attributes\TokenRegexAttribute.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="Executor.cs" />

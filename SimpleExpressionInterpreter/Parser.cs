@@ -1,6 +1,30 @@
 ﻿using System.Collections.Generic;
 using ExpressionInterpreter.Tokens;
 
+/// <summary>
+/// RootExpression = 
+///     | Expression
+///     ;
+/// 
+/// Expression = 
+///     | BinaryExpression
+///     | PrimaryExprssion
+///     | (Expression)
+///     ;
+/// 
+/// BinaryExpression = 
+///     | Expression + Expression
+///     | Expression - Expression
+///     | Expression * Expression
+///     | Expression / Expression
+///     ;
+///     
+/// PrimaryExpression
+///     | Id
+///     | Num
+///     ;
+/// </summary>
+
 namespace ExpressionInterpreter
 {
     public class Parser
@@ -70,6 +94,36 @@ namespace ExpressionInterpreter
                 postfix.Add(mark.Pop());
             }
             return postfix;
+        }
+
+        private Token token;
+
+        public void LR(Lexer lexer)
+        {
+        }
+
+        private void Advance(IEnumerator<Token> enumerator)
+        {
+            if (enumerator.MoveNext())
+            {
+                token = enumerator.Current;
+            }
+            else
+            {
+                // TODO: handle error
+            }
+        }
+
+        private void Eat(TokenType t, IEnumerator<Token> enumerator)
+        {
+            if (token.tokenType == t)
+            {
+                Advance(enumerator);
+            }
+            else
+            {
+                // TODO: handle error
+            }
         }
     }
 }

@@ -39,7 +39,7 @@ namespace ExpressionInterpreter
                 {
                     case TokenType.Id:
                         bytes.Add((byte)(Instruction.PushVariable));
-                        bytes.AddRange(BitConverter.GetBytes(VarMap.GetVarId(token.value)));
+                        bytes.AddRange(BitConverter.GetBytes(int.Parse(token.value.Substring(1))));
                         break;
                     case TokenType.Num:
                         bytes.Add((byte)Instruction.PushLiteral);

@@ -87,7 +87,7 @@
         }
     }
 
-    [TokenRegex(@"\G[a-zA-Z$]([a-zA-Z$\d])*", Priority = 1)]
+    [TokenRegex(@"\G\$\d+", Priority = 1)]
     public sealed class Id : Token
     {
         public Id(string value)

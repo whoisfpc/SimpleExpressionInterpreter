@@ -13,7 +13,7 @@ namespace ExpressionInterpreter
             stack = new Stack<float>(128);
         }
 
-        public float Execute(byte[] bytecodes, Dictionary<int, float> variables)
+        public float Execute(byte[] bytecodes, IList<float> variables)
         {
             stack.Clear();
             var i = 0;
@@ -25,15 +25,15 @@ namespace ExpressionInterpreter
                 switch (inst)
                 {
                     case Instruction.PushVariable:
-                        int varId = BitConverter.ToInt32(bytecodes, i);
+                        int varIdx = BitConverter.ToInt32(bytecodes, i);
                         i += 4;
-                        if (variables.ContainsKey(varId))
+                        if (varIdx >= 0 && varIdx < variables.Count)
                         {
-                            stack.Push(variables[varId]);
+                            stack.Push(variables[varIdx]);
                         }
                         else
                         {
-                            Console.WriteLine("Error: var not found, id: {0}", varId);
+                            Console.WriteLine("Error: var not found, id: {0}", varIdx);
                             return 0;
                         }
                         break;
