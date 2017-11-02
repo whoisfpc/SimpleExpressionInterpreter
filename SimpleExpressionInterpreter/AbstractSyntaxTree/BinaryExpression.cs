@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
 namespace ExpressionInterpreter.AbstractSyntaxTree
 {
@@ -27,6 +28,27 @@ namespace ExpressionInterpreter.AbstractSyntaxTree
             left.Dump(stringBuilder, indent + 2);
             right.Dump(stringBuilder, indent + 2);
             stringBuilder.Append(indentChars).Append(")").AppendLine();
+        }
+
+        public override void Compile(List<byte> bytecodes)
+        {
+            left.Compile(bytecodes);
+            right.Compile(bytecodes);
+            switch (op)
+            {
+                case Operator.Add:
+                    bytecodes.Add((byte)Instruction.Add);
+                    break;
+                case Operator.Sub:
+                    bytecodes.Add((byte)Instruction.Sub);
+                    break;
+                case Operator.Mul:
+                    bytecodes.Add((byte)Instruction.Mul);
+                    break;
+                case Operator.Div:
+                    bytecodes.Add((byte)Instruction.Div);
+                    break;
+            }
         }
     }
 }

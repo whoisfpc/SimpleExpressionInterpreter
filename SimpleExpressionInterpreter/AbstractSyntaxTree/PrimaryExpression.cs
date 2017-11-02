@@ -1,13 +1,23 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ExpressionInterpreter.AbstractSyntaxTree
 {
     public class PrimaryExpression : Expression
     {
-        public string value;
-
-        public PrimaryExpression(string value)
+        public enum PrimaryType
         {
+            Id,
+            Num
+        }
+
+        public string value;
+        public PrimaryType primaryType;
+
+        public PrimaryExpression(PrimaryType primaryType, string value)
+        {
+            this.primaryType = primaryType;
             this.value = value;
         }
 
@@ -19,7 +29,21 @@ namespace ExpressionInterpreter.AbstractSyntaxTree
             {
                 indentChars[i] = ' ';
             }
-            stringBuilder.Append(indentChars).Append("Primary("+value+")").AppendLine();
+            stringBuilder.Append(indentChars).Append("Primary "+ primaryType +"("+value+")").AppendLine();
+        }
+
+        public override void Compile(List<byte> bytecodes)
+        {
+            if (primaryType == PrimaryType.Id)
+            {
+                bytecodes.Add((byte)Instruction.PushVariable);
+                bytecodes.AddRange(BitConverter.GetBytes(int.Parse(value.Substring(1))));
+            }
+            else
+            {
+                bytecodes.Add((byte)Instruction.PushLiteral);
+                bytecodes.AddRange(BitConverter.GetBytes(float.Parse(value)));
+            }
         }
     }
 }

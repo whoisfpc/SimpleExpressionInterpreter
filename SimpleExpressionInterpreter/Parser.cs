@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ExpressionInterpreter.Tokens;
+using ExpressionInterpreter.AbstractSyntaxTree;
 
 /// <summary>
 /// RootExpression = 
@@ -40,8 +41,64 @@ namespace ExpressionInterpreter
             priority[TokenType.Div] = 1;
         }
 
-        // TODO: 需要构造抽象语法树来提供更好的扩展性, 现在先返回后缀表达式，没有容错处理
-        public IList<Token> Parse(Lexer lexer)
+        public RootExpression Parse(Lexer lexer)
+        {
+            Stack<Expression> stack = new Stack<Expression>();
+
+            var posfix = Infix2Postfix(lexer);
+            Expression tmp1;
+            Expression tmp2;
+            foreach (var token in posfix)
+            {
+                switch (token.tokenType)
+                {
+                    case TokenType.Id:
+                        stack.Push(new PrimaryExpression(PrimaryExpression.PrimaryType.Id, token.value));
+                        break;
+                    case TokenType.Num:
+                        stack.Push(new PrimaryExpression(PrimaryExpression.PrimaryType.Num, token.value));
+                        break;
+                    case TokenType.Plus:
+                    case TokenType.Minus:
+                    case TokenType.Mul:
+                    case TokenType.Div:
+                        tmp1 = stack.Pop();
+                        tmp2 = stack.Pop();
+                        stack.Push(new BinaryExpression(
+                            Token2Operator(token.tokenType),
+                            tmp2,
+                            tmp1
+                            ));
+                        break;
+                    default:
+                        // TODO: need handle error
+                        System.Console.WriteLine("need handle error");
+                        break;
+                }
+            }
+            return new RootExpression(stack.Pop());
+        }
+
+        private Expression.Operator Token2Operator(TokenType t)
+        {
+            switch (t)
+            {
+                case TokenType.Plus:
+                    return Expression.Operator.Add;
+                case TokenType.Minus:
+                    return Expression.Operator.Sub;
+                case TokenType.Mul:
+                    return Expression.Operator.Mul;
+                case TokenType.Div:
+                    return Expression.Operator.Div;
+                default:
+                    // TODO: need handle error
+                    System.Console.WriteLine("need handle error");
+                    return Expression.Operator.Add;
+            }
+        }
+
+        private IList<Token> Infix2Postfix(Lexer lexer)
         {
             List<Token> postfix = new List<Token>();
             Stack<Token> mark = new Stack<Token>();
@@ -94,36 +151,6 @@ namespace ExpressionInterpreter
                 postfix.Add(mark.Pop());
             }
             return postfix;
-        }
-
-        private Token token;
-
-        public void LR(Lexer lexer)
-        {
-        }
-
-        private void Advance(IEnumerator<Token> enumerator)
-        {
-            if (enumerator.MoveNext())
-            {
-                token = enumerator.Current;
-            }
-            else
-            {
-                // TODO: handle error
-            }
-        }
-
-        private void Eat(TokenType t, IEnumerator<Token> enumerator)
-        {
-            if (token.tokenType == t)
-            {
-                Advance(enumerator);
-            }
-            else
-            {
-                // TODO: handle error
-            }
         }
     }
 }

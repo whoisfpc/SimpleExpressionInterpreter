@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Collections.Generic;
 
 namespace ExpressionInterpreter.AbstractSyntaxTree
 {
@@ -22,6 +23,11 @@ namespace ExpressionInterpreter.AbstractSyntaxTree
             stringBuilder.Append(indentChars).Append("Root(").AppendLine();
             exp.Dump(stringBuilder, indent+2);
             stringBuilder.Append(indentChars).Append(")").AppendLine();
+        }
+
+        public override void Compile(List<byte> bytecodes)
+        {
+            exp.Compile(bytecodes);
         }
     }
 }

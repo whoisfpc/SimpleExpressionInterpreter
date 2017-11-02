@@ -1,13 +1,14 @@
 ﻿using System.Text;
+using System.Collections.Generic;
 
 namespace ExpressionInterpreter.AbstractSyntaxTree
 {
-    public class Expression : BaseTree
+    public abstract class Expression : BaseTree
     {
         public enum Operator
         {
             Add,
-            Minus,
+            Sub,
             Mul,
             Div
         }
@@ -26,5 +27,7 @@ namespace ExpressionInterpreter.AbstractSyntaxTree
             Dump(stringBuilder, 0);
             return stringBuilder.ToString();
         }
+
+        public abstract void Compile(List<byte> bytecodes);
     }
 }

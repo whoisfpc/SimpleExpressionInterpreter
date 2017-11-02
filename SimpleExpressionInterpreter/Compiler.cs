@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ExpressionInterpreter.Tokens;
 
 namespace ExpressionInterpreter
 {
@@ -18,50 +17,9 @@ namespace ExpressionInterpreter
 
         public byte[] Compile(string source)
         {
-            foreach (var token in lexer.Analyse(source))
-            {
-                Console.WriteLine("{0}: {1}", token.tokenType, token.value);
-            }
-            var postfix = parser.Parse(lexer.Analyse(source));
-
-            Console.Write("postfix expression: ");
-            foreach (var token in postfix)
-            {
-                Console.Write("{0} ", token);
-            }
-            Console.WriteLine();
-
             var bytes = new List<byte>();
-
-            foreach (var token in postfix)
-            {
-                switch (token.tokenType)
-                {
-                    case TokenType.Id:
-                        bytes.Add((byte)(Instruction.PushVariable));
-                        bytes.AddRange(BitConverter.GetBytes(int.Parse(token.value.Substring(1))));
-                        break;
-                    case TokenType.Num:
-                        bytes.Add((byte)Instruction.PushLiteral);
-                        bytes.AddRange(BitConverter.GetBytes(float.Parse(token.value)));
-                        break;
-                    case TokenType.Plus:
-                        bytes.Add((byte)Instruction.Add);
-                        break;
-                    case TokenType.Minus:
-                        bytes.Add((byte)Instruction.Sub);
-                        break;
-                    case TokenType.Mul:
-                        bytes.Add((byte)Instruction.Mul);
-                        break;
-                    case TokenType.Div:
-                        bytes.Add((byte)Instruction.Div);
-                        break;
-                    default:
-                        Console.WriteLine("Error: unexpect token");
-                        break;
-                }
-            }
+            var absyn = parser.Parse(lexer.Analyse(source));
+            absyn.Compile(bytes);
             bytes.Add((byte)Instruction.Ret);
 
             return bytes.ToArray();
@@ -93,6 +51,12 @@ namespace ExpressionInterpreter
                 }
             }
             Console.WriteLine("===============print bytecode===============");
+        }
+
+        public void PrintAbsyn(string source)
+        {
+            var absyn = parser.Parse(lexer.Analyse(source));
+            Console.Write(absyn.Dump());
         }
     }
 }
