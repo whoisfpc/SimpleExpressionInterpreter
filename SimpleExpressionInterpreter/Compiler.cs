@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ExpressionInterpreter.AbstractSyntaxTree;
 
 namespace ExpressionInterpreter
 {
@@ -17,8 +18,12 @@ namespace ExpressionInterpreter
 
         public byte[] Compile(string source)
         {
+            var absyn = GenerateAbsyn(source);
+            if (absyn == null)
+            {
+                return null;
+            }
             var bytes = new List<byte>();
-            var absyn = parser.Parse(lexer.Analyse(source));
             absyn.Compile(bytes);
             bytes.Add((byte)Instruction.Ret);
 
@@ -27,6 +32,10 @@ namespace ExpressionInterpreter
 
         public void PrintBytecode(byte[] bytes)
         {
+            if (bytes == null)
+            {
+                return;
+            }
             Console.WriteLine("===============print bytecode===============");
             int i = 0;
             while (i < bytes.Length)
@@ -55,8 +64,25 @@ namespace ExpressionInterpreter
 
         public void PrintAbsyn(string source)
         {
-            var absyn = parser.Parse(lexer.Analyse(source));
-            Console.Write(absyn.Dump());
+            var absyn = GenerateAbsyn(source);
+            if (absyn != null)
+            {
+                Console.Write(absyn.Dump());
+            }
+        }
+
+        private RootExpression GenerateAbsyn(string source)
+        {
+            try
+            {
+                var absyn = parser.Parse(lexer.Analyse(source));
+                return absyn;
+            }
+            catch (ParseFailedException e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
     }
 }

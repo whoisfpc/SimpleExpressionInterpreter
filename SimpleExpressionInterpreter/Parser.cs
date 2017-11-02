@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ExpressionInterpreter.Tokens;
 using ExpressionInterpreter.AbstractSyntaxTree;
 
@@ -46,11 +47,18 @@ namespace ExpressionInterpreter
         public RootExpression Parse(Lexer lexer)
         {
             Stack<Expression> stack = new Stack<Expression>();
-
-            var posfix = Infix2Postfix(lexer);
-            Expression tmp1;
-            Expression tmp2;
-            foreach (var token in posfix)
+            IList<Token> postfix;
+            try
+            {
+                postfix = Infix2Postfix(lexer);
+            }
+            catch (LexicalInvalidException e)
+            {
+                throw new ParseFailedException("parse failed at Infix2Postfix", e);
+            }
+            Expression tmp1 = null;
+            Expression tmp2 = null;
+            foreach (var token in postfix)
             {
                 switch (token.tokenType)
                 {
@@ -64,19 +72,22 @@ namespace ExpressionInterpreter
                     case TokenType.Minus:
                     case TokenType.Mul:
                     case TokenType.Div:
-                        tmp1 = stack.Pop();
-                        tmp2 = stack.Pop();
-                        stack.Push(new BinaryExpression(
-                            tmp2.Position,
-                            Token2Operator(token.tokenType),
-                            tmp2,
-                            tmp1
-                            ));
+                        if (TryPop(stack, ref tmp1) && TryPop(stack, ref tmp2))
+                        {
+                            stack.Push(new BinaryExpression(
+                                tmp2.Position,
+                                Token2Operator(token.tokenType),
+                                tmp2,
+                                tmp1
+                                ));
+                        }
+                        else
+                        {
+                            throw new ParseFailedException("parse failed, pop on a empty stack");
+                        }
                         break;
                     default:
-                        // TODO: need handle error
-                        System.Console.WriteLine("need handle error");
-                        break;
+                        throw new ParseFailedException("parse failed, Parentheses don't match");
                 }
             }
             return new RootExpression(0, stack.Pop());
@@ -95,8 +106,7 @@ namespace ExpressionInterpreter
                 case TokenType.Div:
                     return Expression.Operator.Div;
                 default:
-                    // TODO: need handle error
-                    System.Console.WriteLine("need handle error");
+                    Console.WriteLine("这不可能发生。。。");
                     return Expression.Operator.Add;
             }
         }
@@ -146,7 +156,9 @@ namespace ExpressionInterpreter
                         mark.Pop();
                         break;
                     default:
-                        continue;
+                        throw new LexicalInvalidException(
+                            string.Format("unexpected character {0}, at {1}", token.value, token.position)
+                            );
                 }
             }
             while (mark.Count > 0)
@@ -154,6 +166,16 @@ namespace ExpressionInterpreter
                 postfix.Add(mark.Pop());
             }
             return postfix;
+        }
+
+        private bool TryPop<T>(Stack<T> stack, ref T value)
+        {
+            if (stack.Count > 0)
+            {
+                value = stack.Pop();
+                return true;
+            }
+            return false;
         }
     }
 }

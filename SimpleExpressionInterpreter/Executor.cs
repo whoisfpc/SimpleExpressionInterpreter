@@ -15,6 +15,11 @@ namespace ExpressionInterpreter
 
         public float Execute(byte[] bytecodes, IList<float> variables)
         {
+            if (bytecodes == null)
+            {
+                return 0;
+            }
+
             stack.Clear();
             var i = 0;
             float tmp;

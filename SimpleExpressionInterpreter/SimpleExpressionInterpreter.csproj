@@ -49,6 +49,8 @@
     <Compile Include="AbstractSyntaxTree\RootExpression.cs" />
     <Compile Include="Attributes\TokenRegexAttribute.cs" />
     <Compile Include="Compiler.cs" />
+    <Compile Include="Exceptions\LexicalInvalidException.cs" />
+    <Compile Include="Exceptions\ParseFailedException.cs" />
     <Compile Include="Executor.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Lexer.cs" />
