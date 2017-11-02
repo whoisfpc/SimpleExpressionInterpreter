@@ -39,7 +39,7 @@ namespace ExpressionInterpreter
                 {
                     var tokenRegex = type.GetCustomAttribute<TokenRegexAttribute>();
                     var regex = new Regex(tokenRegex.Pattern);
-                    var ctor = type.GetConstructor(new Type[] { typeof(string) });
+                    var ctor = type.GetConstructor(new Type[] { typeof(string), typeof(int) });
                     sortedLex.Add(tokenRegex.Priority, new LexInfo(regex, ctor));
                 }
             }
@@ -163,10 +163,10 @@ namespace ExpressionInterpreter
                 if (match.Success)
                 {
                     pos = match.Index + match.Length;
-                    return lexInfo.CtorInfo.Invoke(new object[] { match.Value }) as Token;
+                    return lexInfo.CtorInfo.Invoke(new object[] { match.Value, match.Index }) as Token;
                 }
             }
-            return new Error("");
+            return new Error("", pos);
         }
 
         public void Reset()

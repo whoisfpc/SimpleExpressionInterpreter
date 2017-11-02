@@ -5,12 +5,16 @@ namespace ExpressionInterpreter.AbstractSyntaxTree
 {
     public class BinaryExpression : Expression
     {
+        public override int Position => position;
+
         public Operator op;
         public Expression left;
         public Expression right;
+        private int position;
 
-        public BinaryExpression(Operator op, Expression left, Expression right)
+        public BinaryExpression(int position, Operator op, Expression left, Expression right)
         {
+            this.position = position;
             this.op = op;
             this.left = left;
             this.right = right;

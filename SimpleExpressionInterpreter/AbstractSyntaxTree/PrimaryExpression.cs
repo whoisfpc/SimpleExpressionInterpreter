@@ -12,11 +12,16 @@ namespace ExpressionInterpreter.AbstractSyntaxTree
             Num
         }
 
+        public override int Position => position;
+
         public string value;
         public PrimaryType primaryType;
 
-        public PrimaryExpression(PrimaryType primaryType, string value)
+        private int position;
+
+        public PrimaryExpression(int position, PrimaryType primaryType, string value)
         {
+            this.position = position;
             this.primaryType = primaryType;
             this.value = value;
         }

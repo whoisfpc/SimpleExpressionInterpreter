@@ -13,6 +13,8 @@ namespace ExpressionInterpreter.AbstractSyntaxTree
             Div
         }
 
+        public abstract int Position { get; }
+
         public virtual void Dump(StringBuilder stringBuilder, int indent)
         {
             if (stringBuilder == null)

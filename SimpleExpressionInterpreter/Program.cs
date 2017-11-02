@@ -11,6 +11,7 @@ namespace ExpressionInterpreter
             var compiler = new Compiler();
             var executor = new Executor();
             var variables = new List<float>{ 1, 2, 3 };
+            Console.WriteLine("predefined variables: 1, 2, 3");
             do
             {
                 Console.WriteLine();

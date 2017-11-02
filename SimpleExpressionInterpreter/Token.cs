@@ -55,6 +55,10 @@
         /// </summary>
         public string value;
         /// <summary>
+        /// token的起始位置
+        /// </summary>
+        public int position;
+        /// <summary>
         /// 该Token是否需要被忽略，（如注释，空格等）
         /// </summary>
         public virtual bool Ignore => false;
@@ -68,10 +72,11 @@
     [TokenRegex(@"\G.", Priority = 0)]
     public sealed class Error : Token
     {
-        public Error(string value)
+        public Error(string value, int position)
         {
             tokenType = TokenType.Error;
             this.value = value;
+            this.position = position;
         }
     }
 
@@ -80,90 +85,99 @@
     {
         public override bool Ignore => true;
 
-        public Space(string value)
+        public Space(string value, int position)
         {
             tokenType = TokenType.Space;
             this.value = value;
+            this.position = position;
         }
     }
 
     [TokenRegex(@"\G\$\d+", Priority = 1)]
     public sealed class Id : Token
     {
-        public Id(string value)
+        public Id(string value, int position)
         {
             tokenType = TokenType.Id;
             this.value = value;
+            this.position = position;
         }
     }
 
     [TokenRegex(@"\G\d+(\.\d+)?", Priority = 2)]
     public sealed class Num : Token
     {
-        public Num(string value)
+        public Num(string value, int position)
         {
             tokenType = TokenType.Num;
             this.value = value;
+            this.position = position;
         }
     }
 
     [TokenRegex(@"\G\+", Priority = 2)]
     public sealed class Plus : Token
     {
-        public Plus(string value)
+        public Plus(string value, int position)
         {
             tokenType = TokenType.Plus;
             this.value = value;
+            this.position = position;
         }
     }
 
     [TokenRegex(@"\G\-", Priority = 2)]
     public sealed class Minus : Token
     {
-        public Minus(string value)
+        public Minus(string value, int position)
         {
             tokenType = TokenType.Minus;
             this.value = value;
+            this.position = position;
         }
     }
 
     [TokenRegex(@"\G\*", Priority = 2)]
     public sealed class Mul : Token
     {
-        public Mul(string value)
+        public Mul(string value, int position)
         {
             tokenType = TokenType.Mul;
             this.value = value;
+            this.position = position;
         }
     }
 
     [TokenRegex(@"\G/", Priority = 2)]
     public sealed class Div : Token
     {
-        public Div(string value)
+        public Div(string value, int position)
         {
             tokenType = TokenType.Div;
             this.value = value;
+            this.position = position;
         }
     }
 
     [TokenRegex(@"\G\(", Priority = 2)]
     public sealed class LP : Token
     {
-        public LP(string value)
+        public LP(string value, int position)
         {
             tokenType = TokenType.LP;
             this.value = value;
+            this.position = position;
         }
     }
 
     [TokenRegex(@"\G\)", Priority = 2)]
     public sealed class RP : Token
     {
-        public RP(string value)
+        public RP(string value, int position)
         {
             tokenType = TokenType.RP;
             this.value = value;
+            this.position = position;
         }
     }
 }

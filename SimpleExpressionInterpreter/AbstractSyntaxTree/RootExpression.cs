@@ -5,10 +5,15 @@ namespace ExpressionInterpreter.AbstractSyntaxTree
 {
     public class RootExpression : Expression
     {
+        public override int Position => position;
+
         public Expression exp;
 
-        public RootExpression(Expression exp)
+        private int position;
+
+        public RootExpression(int position, Expression exp)
         {
+            this.position = position;
             this.exp = exp;
         }
 

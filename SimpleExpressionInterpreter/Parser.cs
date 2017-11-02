@@ -34,11 +34,13 @@ namespace ExpressionInterpreter
 
         public Parser()
         {
-            priority = new Dictionary<TokenType, int>();
-            priority[TokenType.Plus] = 0;
-            priority[TokenType.Minus] = 0;
-            priority[TokenType.Mul] = 1;
-            priority[TokenType.Div] = 1;
+            priority = new Dictionary<TokenType, int>
+            {
+                [TokenType.Plus] = 0,
+                [TokenType.Minus] = 0,
+                [TokenType.Mul] = 1,
+                [TokenType.Div] = 1
+            };
         }
 
         public RootExpression Parse(Lexer lexer)
@@ -53,10 +55,10 @@ namespace ExpressionInterpreter
                 switch (token.tokenType)
                 {
                     case TokenType.Id:
-                        stack.Push(new PrimaryExpression(PrimaryExpression.PrimaryType.Id, token.value));
+                        stack.Push(new PrimaryExpression(token.position, PrimaryExpression.PrimaryType.Id, token.value));
                         break;
                     case TokenType.Num:
-                        stack.Push(new PrimaryExpression(PrimaryExpression.PrimaryType.Num, token.value));
+                        stack.Push(new PrimaryExpression(token.position, PrimaryExpression.PrimaryType.Num, token.value));
                         break;
                     case TokenType.Plus:
                     case TokenType.Minus:
@@ -65,6 +67,7 @@ namespace ExpressionInterpreter
                         tmp1 = stack.Pop();
                         tmp2 = stack.Pop();
                         stack.Push(new BinaryExpression(
+                            tmp2.Position,
                             Token2Operator(token.tokenType),
                             tmp2,
                             tmp1
@@ -76,7 +79,7 @@ namespace ExpressionInterpreter
                         break;
                 }
             }
-            return new RootExpression(stack.Pop());
+            return new RootExpression(0, stack.Pop());
         }
 
         private Expression.Operator Token2Operator(TokenType t)
