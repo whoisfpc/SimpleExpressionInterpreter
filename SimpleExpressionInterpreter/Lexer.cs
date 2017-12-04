@@ -21,6 +21,7 @@ namespace ExpressionInterpreter
         /// 按照优先级排列的词法分析信息
         /// </summary>
         private SortedList<int, LexInfo> sortedLex;
+        private IList<LexInfo> lexinfos;
 
         public Lexer()
         {
@@ -43,6 +44,7 @@ namespace ExpressionInterpreter
                     sortedLex.Add(tokenRegex.Priority, new LexInfo(regex, ctor));
                 }
             }
+            lexinfos = sortedLex.Values;
         }
 
         public Lexer Analyse(string source)
@@ -53,13 +55,55 @@ namespace ExpressionInterpreter
 
         public IEnumerator<Token> GetEnumerator()
         {
-            return new TokenEnumerator(source, sortedLex.Values);
+            int pos = 0;
+            if (pos >= source.Length)
+            {
+                yield break;
+            }
+            while (pos < source.Length)
+            {
+                var token = FindToken(ref pos);
+                if (!token.Ignore)
+                {
+                    yield return token;
+                }
+            }
+            yield break;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new TokenEnumerator(source, sortedLex.Values);
+            int pos = 0;
+            if (pos >= source.Length)
+            {
+                yield break;
+            }
+            while (pos < source.Length)
+            {
+                var token = FindToken(ref pos);
+                if (!token.Ignore)
+                {
+                    yield return token;
+                }
+            }
+            yield break;
         }
+
+        private Token FindToken(ref int pos)
+        {
+            for (int i = 0; i < lexinfos.Count; i++)
+            {
+                var lexInfo = lexinfos[i];
+                var match = lexInfo.Regex.Match(source, pos);
+                if (match.Success)
+                {
+                    pos = match.Index + match.Length;
+                    return lexInfo.CtorInfo.Invoke(new object[] { match.Value, match.Index }) as Token;
+                }
+            }
+            return new Error("", pos);
+        }
+
 
         public class LexInfo
         {
@@ -71,109 +115,6 @@ namespace ExpressionInterpreter
                 Regex = regex;
                 CtorInfo = ctorInfo;
             }
-        }
-    }
-
-    public class TokenEnumerator : IEnumerator<Token>
-    {
-        public Token Current
-        {
-            get
-            {
-                if (source == null || current == null)
-                {
-                    throw new InvalidOperationException();
-                }
-                else
-                {
-                    return current;
-                }
-            }
-        }
-
-        object IEnumerator.Current => Current;
-
-        private string source;
-        private IList<Lexer.LexInfo> lexInfos;
-        private Token current;
-        private StringBuilder numBuilder;
-        private int pos;
-        private bool disposed = false;
-
-        public TokenEnumerator(string source, IList<Lexer.LexInfo> lexInfos)
-        {
-            this.source = source;
-            this.lexInfos = lexInfos;
-            numBuilder = new StringBuilder();
-            pos = 0;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    // dispose resources with IDispose interface
-                }
-                // dispose resources witout IDispose interface
-                source = null;
-                lexInfos = null;
-                current = null;
-                numBuilder = null;
-            }
-            disposed = true;
-        }
-
-        ~TokenEnumerator()
-        {
-            Dispose(false);
-        }
-
-        public bool MoveNext()
-        {
-            if (pos >= source.Length)
-            {
-                return false;
-            }
-            while (pos < source.Length)
-            {
-                var token = FindToken();
-                if (!token.Ignore)
-                {
-                    current = token;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private Token FindToken()
-        {
-            for (int i = 0; i < lexInfos.Count; i++)
-            {
-                var lexInfo = lexInfos[i];
-                var match = lexInfo.Regex.Match(source, pos);
-                if (match.Success)
-                {
-                    pos = match.Index + match.Length;
-                    return lexInfo.CtorInfo.Invoke(new object[] { match.Value, match.Index }) as Token;
-                }
-            }
-            return new Error("", pos);
-        }
-
-        public void Reset()
-        {
-            current = null;
-            numBuilder.Clear();
-            pos = 0;
         }
     }
 }
