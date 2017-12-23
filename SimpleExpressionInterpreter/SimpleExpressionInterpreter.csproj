@@ -68,6 +68,7 @@
     <Compile Include="Token.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AntlrDefine\Expr.g4" />
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
