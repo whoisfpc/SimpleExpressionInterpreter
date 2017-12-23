@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 
 namespace ExpressionInterpreter
 {
@@ -8,21 +10,21 @@ namespace ExpressionInterpreter
         static void Main(string[] args)
         {
             ConsoleKeyInfo key;
-            var compiler = new Compiler();
-            var executor = new Executor();
-            var variables = new List<float>{ 1, 2, 3 };
             Console.WriteLine("predefined variables: 1, 2, 3");
             do
             {
                 Console.WriteLine();
                 Console.Write("input expression:");
                 var source = Console.ReadLine();
+                var inputStream = new AntlrInputStream(source);
+                var lexer = new ExprLexer(inputStream);
+                var tokens = new CommonTokenStream(lexer);
+                var parser = new ExprParser(tokens);
+                var compileListener = new ExprCompileListener();
 
-                var bytecodes = compiler.Compile(source);
-                compiler.PrintBytecode(bytecodes);
-                var result = executor.Execute(bytecodes, variables);
+                ParseTreeWalker.Default.Walk(compileListener, parser.prog());
 
-                Console.WriteLine("calcuate result: {0}", result);
+                //Console.WriteLine(parser.prog().ToStringTree());
                 Console.WriteLine("press Q quit, press other key continue...");
                 key = Console.ReadKey();
             } while (key.Key != ConsoleKey.Q);
