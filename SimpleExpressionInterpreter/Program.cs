@@ -9,22 +9,20 @@ namespace ExpressionInterpreter
     {
         static void Main(string[] args)
         {
+            var compiler = new Compiler();
+            var executor = new Executor();
             ConsoleKeyInfo key;
+            var variables = new List<float> { 1, 2, 3 };
             Console.WriteLine("predefined variables: 1, 2, 3");
             do
             {
                 Console.WriteLine();
                 Console.Write("input expression:");
                 var source = Console.ReadLine();
-                var inputStream = new AntlrInputStream(source);
-                var lexer = new ExprLexer(inputStream);
-                var tokens = new CommonTokenStream(lexer);
-                var parser = new ExprParser(tokens);
-                var compileListener = new ExprCompileListener();
+                var bytecodes = compiler.Compile(source);
+                var result = executor.Execute(bytecodes, variables);
 
-                ParseTreeWalker.Default.Walk(compileListener, parser.prog());
-
-                //Console.WriteLine(parser.prog().ToStringTree());
+                Console.WriteLine("result = " + result);
                 Console.WriteLine("press Q quit, press other key continue...");
                 key = Console.ReadKey();
             } while (key.Key != ConsoleKey.Q);

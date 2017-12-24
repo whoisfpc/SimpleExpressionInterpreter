@@ -1,33 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using ExpressionInterpreter.AbstractSyntaxTree;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 
 namespace ExpressionInterpreter
 {
     // 暂时先通过解析后缀表达式来生成bytecode
     public class Compiler
     {
-        private Lexer lexer;
-        private Parser parser;
-
-        public Compiler()
-        {
-            lexer = new Lexer();
-            parser = new Parser();
-        }
-
         public byte[] Compile(string source)
         {
-            var absyn = GenerateAbsyn(source);
-            if (absyn == null)
-            {
-                return null;
-            }
-            var bytes = new List<byte>();
-            absyn.Compile(bytes);
-            bytes.Add((byte)Instruction.Ret);
+            var inputStream = new AntlrInputStream(source);
+            var lexer = new ExprLexer(inputStream);
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new ExprParser(tokens);
 
-            return bytes.ToArray();
+            var compileListener = new ExprCompileListener();
+            ParseTreeWalker.Default.Walk(compileListener, parser.prog());
+
+            return compileListener.bytecodes.ToArray();
         }
 
         public void PrintBytecode(byte[] bytes)
@@ -64,25 +54,7 @@ namespace ExpressionInterpreter
 
         public void PrintAbsyn(string source)
         {
-            var absyn = GenerateAbsyn(source);
-            if (absyn != null)
-            {
-                Console.Write(absyn.Dump());
-            }
-        }
-
-        private RootExpression GenerateAbsyn(string source)
-        {
-            try
-            {
-                var absyn = parser.Parse(lexer.Analyse(source));
-                return absyn;
-            }
-            catch (ParseFailedException e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
+            throw new NotImplementedException();
         }
     }
 }
