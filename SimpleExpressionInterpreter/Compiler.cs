@@ -4,7 +4,6 @@ using Antlr4.Runtime.Tree;
 
 namespace ExpressionInterpreter
 {
-    // 暂时先通过解析后缀表达式来生成bytecode
     public class Compiler
     {
         public byte[] Compile(string source)
@@ -13,10 +12,16 @@ namespace ExpressionInterpreter
             var lexer = new ExprLexer(inputStream);
             var tokens = new CommonTokenStream(lexer);
             var parser = new ExprParser(tokens);
-
+            var tree = parser.prog();
+            Console.WriteLine(tree.ToStringTree(parser));
+            return null;
+            if (parser.NumberOfSyntaxErrors > 0)
+            {
+                Console.WriteLine("{0} syntax errors finded, compile failed, 现在并不想写优雅的错误处理", parser.NumberOfSyntaxErrors);
+                return null;
+            }
             var compileListener = new ExprCompileListener();
-            ParseTreeWalker.Default.Walk(compileListener, parser.prog());
-
+            ParseTreeWalker.Default.Walk(compileListener, tree);
             return compileListener.bytecodes.ToArray();
         }
 

@@ -19,6 +19,7 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
+namespace ExpressionInterpreter {
 
 using Antlr4.Runtime.Misc;
 using IErrorNode = Antlr4.Runtime.Tree.IErrorNode;
@@ -46,6 +47,20 @@ public partial class ExprBaseListener : IExprListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitProg([NotNull] ExprParser.ProgContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>funcExpr</c>
+	/// labeled alternative in <see cref="ExprParser.expr"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterFuncExpr([NotNull] ExprParser.FuncExprContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>funcExpr</c>
+	/// labeled alternative in <see cref="ExprParser.expr"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitFuncExpr([NotNull] ExprParser.FuncExprContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>singleExpr</c>
 	/// labeled alternative in <see cref="ExprParser.expr"/>.
@@ -89,6 +104,18 @@ public partial class ExprBaseListener : IExprListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBinaryExpr([NotNull] ExprParser.BinaryExprContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="ExprParser.exprList"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterExprList([NotNull] ExprParser.ExprListContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="ExprParser.exprList"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitExprList([NotNull] ExprParser.ExprListContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="ExprParser.term"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -114,3 +141,4 @@ public partial class ExprBaseListener : IExprListener {
 	/// <remarks>The default implementation does nothing.</remarks>
 	public virtual void VisitErrorNode([NotNull] IErrorNode node) { }
 }
+} // namespace ExpressionInterpreter

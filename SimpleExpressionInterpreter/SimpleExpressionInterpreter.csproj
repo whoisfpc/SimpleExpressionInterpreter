@@ -50,7 +50,6 @@
     <Compile Include="Antlr\ExprLexer.cs" />
     <Compile Include="Antlr\ExprListener.cs" />
     <Compile Include="Antlr\ExprParser.cs" />
-    <Compile Include="Attributes\TokenRegexAttribute.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="Exceptions\LexicalInvalidException.cs" />
     <Compile Include="Exceptions\ParseFailedException.cs" />

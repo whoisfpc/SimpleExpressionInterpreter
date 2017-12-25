@@ -19,6 +19,7 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
+namespace ExpressionInterpreter {
 using Antlr4.Runtime.Misc;
 using IParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
 using IToken = Antlr4.Runtime.IToken;
@@ -40,6 +41,18 @@ public interface IExprListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitProg([NotNull] ExprParser.ProgContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>funcExpr</c>
+	/// labeled alternative in <see cref="ExprParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterFuncExpr([NotNull] ExprParser.FuncExprContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>funcExpr</c>
+	/// labeled alternative in <see cref="ExprParser.expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitFuncExpr([NotNull] ExprParser.FuncExprContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>singleExpr</c>
 	/// labeled alternative in <see cref="ExprParser.expr"/>.
@@ -77,6 +90,16 @@ public interface IExprListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitBinaryExpr([NotNull] ExprParser.BinaryExprContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="ExprParser.exprList"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterExprList([NotNull] ExprParser.ExprListContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="ExprParser.exprList"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitExprList([NotNull] ExprParser.ExprListContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="ExprParser.term"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -87,3 +110,4 @@ public interface IExprListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitTerm([NotNull] ExprParser.TermContext context);
 }
+} // namespace ExpressionInterpreter

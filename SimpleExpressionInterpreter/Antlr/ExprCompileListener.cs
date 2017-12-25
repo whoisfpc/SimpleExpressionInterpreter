@@ -41,7 +41,7 @@ namespace ExpressionInterpreter
             {
                 bytecodes.Add((byte)Instruction.PushLiteral);
             }
-            else if (context.ID() != null)
+            else if (context.PREVAR() != null)
             {
                 bytecodes.Add((byte)Instruction.PushVariable);
             }
@@ -54,9 +54,9 @@ namespace ExpressionInterpreter
                 var value = context.NUM().GetText();
                 bytecodes.AddRange(BitConverter.GetBytes(float.Parse(value)));
             }
-            else if (context.ID() != null)
+            else if (context.PREVAR() != null)
             {
-                var value = context.ID().GetText();
+                var value = context.PREVAR().GetText();
                 bytecodes.AddRange(BitConverter.GetBytes(int.Parse(value.Substring(1))));
             }
         }
