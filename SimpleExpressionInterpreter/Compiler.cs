@@ -13,15 +13,20 @@ namespace ExpressionInterpreter
             var tokens = new CommonTokenStream(lexer);
             var parser = new ExprParser(tokens);
             var tree = parser.prog();
-            Console.WriteLine(tree.ToStringTree(parser));
-            return null;
             if (parser.NumberOfSyntaxErrors > 0)
             {
-                Console.WriteLine("{0} syntax errors finded, compile failed, 现在并不想写优雅的错误处理", parser.NumberOfSyntaxErrors);
+                Console.WriteLine("{0} syntax errors found, compile failed, 现在并不想写优雅的错误处理", parser.NumberOfSyntaxErrors);
                 return null;
             }
             var compileListener = new ExprCompileListener();
-            ParseTreeWalker.Default.Walk(compileListener, tree);
+            try
+            {
+                ParseTreeWalker.Default.Walk(compileListener, tree);
+            }
+            catch (ParseFailedException e)
+            {
+                Console.WriteLine(e.Message);
+            }
             return compileListener.bytecodes.ToArray();
         }
 
@@ -47,6 +52,11 @@ namespace ExpressionInterpreter
                     case Instruction.PushVariable:
                         var varId = BitConverter.ToInt32(bytes, i);
                         Console.WriteLine("{0}\tid: {1}", inst, varId);
+                        i += 4;
+                        break;
+                    case Instruction.Call:
+                        var funcId = BitConverter.ToInt32(bytes, i);
+                        Console.WriteLine("{0}\t function id: {1}", inst, VirtualMachine.GetPredefineFuncName(funcId));
                         i += 4;
                         break;
                     default:

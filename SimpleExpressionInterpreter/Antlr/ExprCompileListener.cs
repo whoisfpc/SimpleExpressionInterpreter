@@ -11,7 +11,6 @@ namespace ExpressionInterpreter
 
         public override void ExitProg([NotNull] ExprParser.ProgContext context)
         {
-            base.ExitProg(context);
             bytecodes.Add((byte)Instruction.Ret);
         }
 
@@ -59,6 +58,22 @@ namespace ExpressionInterpreter
                 var value = context.PREVAR().GetText();
                 bytecodes.AddRange(BitConverter.GetBytes(int.Parse(value.Substring(1))));
             }
+        }
+
+        public override void EnterFuncExpr([NotNull] ExprParser.FuncExprContext context)
+        {
+            var funcName = context.ID().GetText();
+            if (!VirtualMachine.CheckFuncDefine(funcName))
+            {
+                throw new ParseFailedException(string.Format("function {0} not defined!", funcName));
+            }
+        }
+
+        public override void ExitFuncExpr([NotNull] ExprParser.FuncExprContext context)
+        {
+            var funcName = context.ID().GetText();
+            bytecodes.Add((byte)Instruction.Call);
+            bytecodes.AddRange(BitConverter.GetBytes(VirtualMachine.GetPredefineFuncId(funcName)));
         }
 
         private enum Operator

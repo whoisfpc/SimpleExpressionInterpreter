@@ -20,6 +20,7 @@ namespace ExpressionInterpreter
                 Console.Write("input expression:");
                 var source = Console.ReadLine();
                 var bytecodes = compiler.Compile(source);
+                //compiler.PrintBytecode(bytecodes);
                 var result = executor.Execute(bytecodes, variables);
 
                 Console.WriteLine("result = " + result);

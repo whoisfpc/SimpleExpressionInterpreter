@@ -6,21 +6,35 @@ namespace ExpressionInterpreter
     // 没有容错
     public class Executor
     {
-        private Stack<float> stack;
+        private VirtualMachine vm;
 
         public Executor()
         {
-            stack = new Stack<float>(128);
+            vm = new VirtualMachine();
         }
 
         public float Execute(byte[] bytecodes, IList<float> variables)
+        {
+            var result = 0f;
+            try
+            {
+                result = _Execute(bytecodes, variables);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return result;
+        }
+
+        private float _Execute(byte[] bytecodes, IList<float> variables)
         {
             if (bytecodes == null)
             {
                 return 0;
             }
 
-            stack.Clear();
+            vm.Reset();
             var i = 0;
             float tmp;
             while (i < bytecodes.Length)
@@ -34,7 +48,7 @@ namespace ExpressionInterpreter
                         i += 4;
                         if (varIdx >= 0 && varIdx < variables.Count)
                         {
-                            stack.Push(variables[varIdx]);
+                            vm.Push(variables[varIdx]);
                         }
                         else
                         {
@@ -44,31 +58,36 @@ namespace ExpressionInterpreter
                         break;
                     case Instruction.PushLiteral:
                         tmp = BitConverter.ToSingle(bytecodes, i);
-                        stack.Push(tmp);
+                        vm.Push(tmp);
                         i += 4;
                         break;
                     case Instruction.Add:
-                        tmp = stack.Pop();
-                        tmp = stack.Pop() + tmp;
-                        stack.Push(tmp);
+                        tmp = vm.Pop<float>();
+                        tmp = vm.Pop<float>() + tmp;
+                        vm.Push(tmp);
                         break;
                     case Instruction.Sub:
-                        tmp = stack.Pop();
-                        tmp = stack.Pop() - tmp;
-                        stack.Push(tmp);
+                        tmp = vm.Pop<float>();
+                        tmp = vm.Pop<float>() - tmp;
+                        vm.Push(tmp);
                         break;
                     case Instruction.Mul:
-                        tmp = stack.Pop();
-                        tmp = stack.Pop() * tmp;
-                        stack.Push(tmp);
+                        tmp = vm.Pop<float>();
+                        tmp = vm.Pop<float>() * tmp;
+                        vm.Push(tmp);
                         break;
                     case Instruction.Div:
-                        tmp = stack.Pop();
-                        tmp = stack.Pop() / tmp;
-                        stack.Push(tmp);
+                        tmp = vm.Pop<float>();
+                        tmp = vm.Pop<float>() / tmp;
+                        vm.Push(tmp);
+                        break;
+                    case Instruction.Call:
+                        var funcId = BitConverter.ToInt32(bytecodes, i);
+                        i += 4;
+                        vm.CallFunc(funcId);
                         break;
                     case Instruction.Ret:
-                        return stack.Pop();
+                        return vm.Pop<float>();
                     default:
                         Console.WriteLine("Error: unexpect inst");
                         return 0;
