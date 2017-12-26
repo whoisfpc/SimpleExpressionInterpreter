@@ -113,5 +113,49 @@ namespace ExpressionInterpreter
         {
             return a > b ? b : a;
         }
+
+        [PredefineFunc("vec", 3)]
+        private static Vector Vec(float x, float y, float z)
+        {
+            return new Vector(x, y, z);
+        }
+
+        [PredefineFunc("dot", 4)]
+        private static float Dot(Vector a, Vector b)
+        {
+            return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
+
+        [PredefineFunc("scale", 5)]
+        private static Vector Scale(Vector a, float s)
+        {
+            return new Vector(a.x * s, a.y * s, a.z * s);
+        }
+
+        // 和unity一样使用左手坐标系
+        [PredefineFunc("cross", 6)]
+        private static Vector Cross(Vector a, Vector b)
+        {
+            return new Vector(b.y * a.z - b.z * a.y, b.z * a.x - b.x * a.z, b.x * a.y - b.y * a.x);
+        }
+    }
+
+    public struct Vector
+    {
+        public float x;
+        public float y;
+        public float z;
+
+        public Vector(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("vec({0}, {1}, {2})", x, y, z);
+        }
     }
 }

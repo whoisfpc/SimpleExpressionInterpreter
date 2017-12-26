@@ -23,7 +23,7 @@ namespace ExpressionInterpreter
                 //compiler.PrintBytecode(bytecodes);
                 var result = executor.Execute(bytecodes, variables);
 
-                Console.WriteLine("result = " + result);
+                Console.WriteLine("result = " + result.ToString());
                 Console.WriteLine("press Q quit, press other key continue...");
                 key = Console.ReadKey();
             } while (key.Key != ConsoleKey.Q);

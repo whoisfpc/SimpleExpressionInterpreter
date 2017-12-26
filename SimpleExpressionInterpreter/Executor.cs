@@ -13,9 +13,9 @@ namespace ExpressionInterpreter
             vm = new VirtualMachine();
         }
 
-        public float Execute(byte[] bytecodes, IList<float> variables)
+        public object Execute(byte[] bytecodes, IList<float> variables)
         {
-            var result = 0f;
+            object result = new object();
             try
             {
                 result = _Execute(bytecodes, variables);
@@ -27,7 +27,7 @@ namespace ExpressionInterpreter
             return result;
         }
 
-        private float _Execute(byte[] bytecodes, IList<float> variables)
+        private object _Execute(byte[] bytecodes, IList<float> variables)
         {
             if (bytecodes == null)
             {
@@ -87,7 +87,7 @@ namespace ExpressionInterpreter
                         vm.CallFunc(funcId);
                         break;
                     case Instruction.Ret:
-                        return vm.Pop<float>();
+                        return vm.Pop<object>();
                     default:
                         Console.WriteLine("Error: unexpect inst");
                         return 0;
