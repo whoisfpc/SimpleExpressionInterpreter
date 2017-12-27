@@ -34,6 +34,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr4.Runtime.Standard, Version=4.7.1.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.1.1\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,25 +45,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractSyntaxTree\BaseTree.cs" />
-    <Compile Include="AbstractSyntaxTree\BinaryExpression.cs" />
-    <Compile Include="AbstractSyntaxTree\Expression.cs" />
-    <Compile Include="AbstractSyntaxTree\PrimaryExpression.cs" />
-    <Compile Include="AbstractSyntaxTree\RootExpression.cs" />
-    <Compile Include="Attributes\TokenRegexAttribute.cs" />
+    <Compile Include="Antlr\ExprBaseListener.cs" />
+    <Compile Include="Antlr\ExprCompileListener.cs" />
+    <Compile Include="Antlr\ExprLexer.cs" />
+    <Compile Include="Antlr\ExprListener.cs" />
+    <Compile Include="Antlr\ExprParser.cs" />
+    <Compile Include="Attributes\PredefineFuncAttribute.cs" />
     <Compile Include="Compiler.cs" />
-    <Compile Include="Exceptions\LexicalInvalidException.cs" />
+    <Compile Include="Exceptions\ExecuteFailedException.cs" />
     <Compile Include="Exceptions\ParseFailedException.cs" />
+    <Compile Include="Exceptions\TypeMismatchException.cs" />
     <Compile Include="Executor.cs" />
     <Compile Include="Instruction.cs" />
-    <Compile Include="Lexer.cs" />
-    <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Token.cs" />
+    <Compile Include="VM\VirtualMachine.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AntlrDefine\Expr.g4" />
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,33 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using ExpressionInterpreter.AbstractSyntaxTree;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 
 namespace ExpressionInterpreter
 {
-    // 暂时先通过解析后缀表达式来生成bytecode
     public class Compiler
     {
-        private Lexer lexer;
-        private Parser parser;
-
-        public Compiler()
-        {
-            lexer = new Lexer();
-            parser = new Parser();
-        }
-
         public byte[] Compile(string source)
         {
-            var absyn = GenerateAbsyn(source);
-            if (absyn == null)
+            var inputStream = new AntlrInputStream(source);
+            var lexer = new ExprLexer(inputStream);
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new ExprParser(tokens);
+            var tree = parser.prog();
+            if (parser.NumberOfSyntaxErrors > 0)
             {
+                Console.WriteLine("{0} syntax errors found, compile failed, 现在并不想写优雅的错误处理", parser.NumberOfSyntaxErrors);
                 return null;
             }
-            var bytes = new List<byte>();
-            absyn.Compile(bytes);
-            bytes.Add((byte)Instruction.Ret);
-
-            return bytes.ToArray();
+            var compileListener = new ExprCompileListener();
+            try
+            {
+                ParseTreeWalker.Default.Walk(compileListener, tree);
+            }
+            catch (ParseFailedException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return compileListener.bytecodes.ToArray();
         }
 
         public void PrintBytecode(byte[] bytes)
@@ -54,6 +54,11 @@ namespace ExpressionInterpreter
                         Console.WriteLine("{0}\tid: {1}", inst, varId);
                         i += 4;
                         break;
+                    case Instruction.Call:
+                        var funcId = BitConverter.ToInt32(bytes, i);
+                        Console.WriteLine("{0}\t function id: {1}", inst, VirtualMachine.GetPredefineFuncName(funcId));
+                        i += 4;
+                        break;
                     default:
                         Console.WriteLine("{0}", inst);
                         break;
@@ -64,25 +69,7 @@ namespace ExpressionInterpreter
 
         public void PrintAbsyn(string source)
         {
-            var absyn = GenerateAbsyn(source);
-            if (absyn != null)
-            {
-                Console.Write(absyn.Dump());
-            }
-        }
-
-        private RootExpression GenerateAbsyn(string source)
-        {
-            try
-            {
-                var absyn = parser.Parse(lexer.Analyse(source));
-                return absyn;
-            }
-            catch (ParseFailedException e)
-            {
-                Console.WriteLine(e);
-                return null;
-            }
+            throw new NotImplementedException();
         }
     }
 }

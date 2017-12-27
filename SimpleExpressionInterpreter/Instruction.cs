@@ -12,6 +12,7 @@
         Sub = 0x05,
         Mul = 0x06,
         Div = 0x07,
-        Ret = 0x08
+        Ret = 0x08,
+        Call = 0x09
     }
 }
