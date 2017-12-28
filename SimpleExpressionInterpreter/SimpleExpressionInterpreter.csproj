@@ -50,6 +50,7 @@
     <Compile Include="Antlr\ExprLexer.cs" />
     <Compile Include="Antlr\ExprListener.cs" />
     <Compile Include="Antlr\ExprParser.cs" />
+    <Compile Include="Antlr\ExprPrintListener.cs" />
     <Compile Include="Attributes\PredefineFuncAttribute.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="Exceptions\ExecuteFailedException.cs" />

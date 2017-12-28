@@ -69,7 +69,16 @@ namespace ExpressionInterpreter
 
         public void PrintAbsyn(string source)
         {
-            throw new NotImplementedException();
+            var inputStream = new AntlrInputStream(source);
+            var lexer = new ExprLexer(inputStream);
+            var tokens = new CommonTokenStream(lexer);
+            var parser = new ExprParser(tokens);
+            var tree = parser.prog();
+            var printListener = new ExprPrintListener();
+            ParseTreeWalker.Default.Walk(printListener, tree);
+
+            var s = printListener.AbsynString;
+            Console.Write(s);
         }
     }
 }
