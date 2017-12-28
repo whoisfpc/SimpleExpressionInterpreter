@@ -13,9 +13,14 @@ namespace ExpressionInterpreter
             vm = new VirtualMachine();
         }
 
+        public object Execute(byte[] bytecodes)
+        {
+            return Execute(bytecodes, null);
+        }
+
         public object Execute(byte[] bytecodes, IList<float> variables)
         {
-            object result = new object();
+            object result = 0.0f;
             try
             {
                 result = _Execute(bytecodes, variables);
@@ -46,7 +51,7 @@ namespace ExpressionInterpreter
                     case Instruction.PushVariable:
                         int varIdx = BitConverter.ToInt32(bytecodes, i);
                         i += 4;
-                        if (varIdx >= 0 && varIdx < variables.Count)
+                        if (variables != null && varIdx >= 0 && varIdx < variables.Count)
                         {
                             vm.Push(variables[varIdx]);
                         }

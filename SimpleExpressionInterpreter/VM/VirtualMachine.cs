@@ -140,7 +140,7 @@ namespace ExpressionInterpreter
         }
     }
 
-    public struct Vector
+    public struct Vector : IEquatable<Vector>
     {
         public float x;
         public float y;
@@ -156,6 +156,30 @@ namespace ExpressionInterpreter
         public override string ToString()
         {
             return string.Format("vec({0}, {1}, {2})", x, y, z);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Vector)
+            {
+                return Equals((Vector)obj);
+            }
+            return false;
+        }
+
+        public bool Equals(Vector other)
+        {
+            return x == other.x && y == other.y && z == other.z;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 373119288;
+            hashCode = hashCode * -1521134295 + base.GetHashCode();
+            hashCode = hashCode * -1521134295 + x.GetHashCode();
+            hashCode = hashCode * -1521134295 + y.GetHashCode();
+            hashCode = hashCode * -1521134295 + z.GetHashCode();
+            return hashCode;
         }
     }
 }
